@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
+  "name": "company-work-log",
   "version": "0.1.0",
+  "description": "A Vue.js frontend for tracking employee work logs.",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,10 +10,13 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "axios": "^1.7.9",
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
-    "vue": "^3.2.13",
-    "vuetify": "^3.0.0-beta.0",
+    "vue": "^2.7.16",
+    "vue-router": "^3.6.5",
+    "vue-template-compiler": "^2.7.16",
+    "vuetify": "^2.7.2",
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {

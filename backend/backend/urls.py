@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from worklogs.views import WorkLogViewSet
+from worklogs.views import login_user, register_user, forgot_password
 
 router = DefaultRouter()
-router.register(r'worklogs', WorkLogViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('api/login/', login_user),
+    path('api/register/', register_user),
+    path('api/forgot-password/', forgot_password),
 ]

@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from worklogs.views import login_user, register_user, forgot_password
+from worklogs.views import login_user, register_user, forgot_password, add_work_log, worklogs
 
 router = DefaultRouter()
 
@@ -25,4 +25,6 @@ urlpatterns = [
     path('api/login/', login_user),
     path('api/register/', register_user),
     path('api/forgot-password/', forgot_password),
+    path('api/add_work_log/', add_work_log),
+    path('api/worklogs/', worklogs, name='worklogs'),
 ]

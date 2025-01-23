@@ -33,12 +33,32 @@ def forgot_password(request):
         return Response({"message": "Password reset link sent to email"})
     return Response({"error": "Email not found"}, status=400)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_work_log(request):
+    data = request.data.copy()
+    data['user'] = request.user.id  # Automatically set the logged-in user
+    serializer = WorkLogSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def worklogs(request):
-    try:
+    if request.user.is_staff:  # Admin user
+        logs = WorkLog.objects.all()
+    else:
         logs = WorkLog.objects.filter(user=request.user)
+    
+    if request.method == 'GET':
         serializer = WorkLogSerializer(logs, many=True)
         return Response(serializer.data)
-    except Exception as e:
-        return Response({'error': str(e)}, status=400)
+
+    elif request.method == 'POST':
+        serializer = WorkLogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)

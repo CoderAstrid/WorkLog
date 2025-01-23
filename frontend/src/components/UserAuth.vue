@@ -54,7 +54,10 @@
         try {
           const response = await this.$http.post('login/', this.loginData);
           localStorage.setItem('token', response.data.token);
-          this.$router.push('/worklog');
+          
+          if (this.$route.path !== '/worklog') {
+            this.$router.push('/worklog');
+          }
         } catch (error) {
           alert('Login failed');
         }

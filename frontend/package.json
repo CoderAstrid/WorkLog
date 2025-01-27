@@ -13,7 +13,7 @@
     "axios": "^1.7.9",
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
-    "vue": "^2.7.16",
+    "vue": "^2.7.2",
     "vue-router": "^3.6.5",
     "vue-template-compiler": "^2.7.16",
     "vuetify": "^2.7.2",
@@ -35,13 +35,17 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
+      "plugin:vue/essential",
       "eslint:recommended"
     ],
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/valid-v-slot": "off",
+      "vue/no-deprecated-slot-attribute": "off",
+      "vue/no-deprecated-slot-scope-attribute": "off"
+    }
   },
   "browserslist": [
     "> 1%",

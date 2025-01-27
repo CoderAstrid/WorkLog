@@ -52,14 +52,20 @@
     methods: {
       async login() {
         try {
+          console.log("Sending login request:", this.loginData);
           const response = await this.$http.post('login/', this.loginData);
+          console.log("Response received:", response.data);
           localStorage.setItem('token', response.data.token);
-          
-          if (this.$route.path !== '/worklog') {
+          localStorage.setItem('role', response.data.role);  // Ensure role is stored
+          if (response.data.role === 'admin') {
+            this.$router.push('/admin');
+            console.log("admin");
+          } else {
             this.$router.push('/worklog');
+            console.log("worklog");
           }
         } catch (error) {
-          alert('Login failed');
+          alert(error.response?.data?.error || 'Login failed');
         }
       },
       async register() {

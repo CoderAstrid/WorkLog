@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'worklogs',  # Ensure your app is included here
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,12 +54,21 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Add this
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",  # Allow frontend access
@@ -125,7 +135,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
+DEBUG = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

@@ -1,20 +1,44 @@
 <template>
   <v-container class="green-background fill-height d-flex align-center justify-center">
-    <v-card class="pa-5" max-width="800">
-      <h1 class="text-center">{{ username }}'s Log</h1>
-      <v-form @submit.prevent="submitWorkLog">
-        <v-text-field v-model="newLog.date" label="Date" type="date" required></v-text-field>
-        <v-text-field v-model="newLog.content" label="Work Content" required></v-text-field>
-        <v-textarea v-model="newLog.notes" label="Notes"></v-textarea>
-        <v-btn type="submit" color="primary">Add Work Log</v-btn>
-      </v-form>
+    <v-card class="pa-5" max-width="900">
+      <h1 class="text-center">Work log of {{ username }}</h1>
 
       <v-data-table
+        v-model="selectedLogs"
         :headers="headers"
         :items="workLogs"
+        item-value="id"
+        show-select
         class="elevation-1 mt-4"
         no-data-text="No work logs available"
-      ></v-data-table>
+      >
+        <template v-slot:item.date="{ item }">
+          <v-edit-dialog v-model="item.date" large persistent @save="updateWorkLog(item)">
+            {{ item.date }}
+            <v-text-field v-model="item.date" type="date" single-line dense></v-text-field>
+          </v-edit-dialog>
+        </template>
+
+        <template #item.content="{ item }">
+          <v-edit-dialog v-model="item.date" large persistent @save="updateWorkLog(item)">
+            {{ item.content }}
+            <template #input>
+              <v-text-field v-model="item.content" label="Work Content" single-line dense></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </template>
+        
+        <template #item.notes="{ item }">
+          <v-edit-dialog v-model="item.notes" large persistent @save="updateWorkLog(item)">
+            {{ item.notes }}
+            <template #input>
+              <v-text-field v-model="item.notes" label="Notes" single-line dense></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </template>
+      </v-data-table>
+
+      <v-btn color="success" class="mt-4" @click="addPreviousDay">Add Previous Day</v-btn>
     </v-card>
   </v-container>
 </template>
@@ -24,12 +48,9 @@ export default {
   data() {
     return {
       username: localStorage.getItem('username') || 'User',
-      newLog: {
-        date: '',
-        content: '',
-        notes: '',
-      },
       workLogs: [],
+      selectedLogs: [],
+      lastAddedDate: new Date(),
       headers: [
         { text: 'Date', value: 'date' },
         { text: 'Work Content', value: 'content' },
@@ -46,30 +67,51 @@ export default {
         const response = await this.$http.get('worklogs/', {
           headers: { Authorization: `Token ${localStorage.getItem('token')}` },
         });
-        this.workLogs = response.data;
+        this.workLogs = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const today = new Date().toISOString().split('T')[0];
+        if (!this.workLogs.some(log => log.date === today)) {
+          this.workLogs.unshift({ id: null, date: today, content: '', notes: '' });
+        }
       } catch (error) {
         console.error('Error fetching work logs:', error);
       }
     },
-    async submitWorkLog() {
+    async updateWorkLog(item) {
       try {
-        this.newLog.user = localStorage.getItem('user_id');  // Ensure user ID is included
-        await this.$http.post('add_work_log/', this.newLog, {
-          headers: { Authorization: `Token ${localStorage.getItem('token')}` },
-        });
-        alert('Work log added successfully');
-        this.fetchWorkLogs();  // Refresh table after submission
+        if (item.id) {
+          await this.$http.put(`worklogs/${item.id}/`, item, {
+            headers: { Authorization: `Token ${localStorage.getItem('token')}` },
+          });
+        } else {
+          await this.$http.post('worklogs/', item, {
+            headers: { Authorization: `Token ${localStorage.getItem('token')}` },
+          });
+        }
+        this.fetchWorkLogs();
       } catch (error) {
-        console.error('Error adding work log:', error.response.data);
+        console.error('Error updating work log:', error);
       }
-    }
+    },
+    addPreviousDay() {
+      const previousDate = new Date(this.lastAddedDate);
+      previousDate.setDate(previousDate.getDate() - 1);
+      this.lastAddedDate = previousDate;
+
+      this.workLogs.push({
+        id: null,
+        date: previousDate.toISOString().split('T')[0],
+        content: '',
+        notes: '',
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
 .green-background {
-  background-color: #4CAF50; /* Green background */
+  background-color: #4CAF50;
   padding: 20px;
   height: 100vh;
 }

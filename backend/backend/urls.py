@@ -1,30 +1,22 @@
-"""
-URL configuration for backend project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from worklogs.views import login_user, register_user, forgot_password, add_work_log, worklogs
-
-router = DefaultRouter()
+from worklogs.views import (
+    login_user, register_user, forgot_password,
+    add_work_log, delete_work_log, worklogs
+)
+from backend.views import AdminWorkLogView, AdminUserManagementView, AdminProfileView
 
 urlpatterns = [
-    path('api/login/', login_user),
-    path('api/register/', register_user),
-    path('api/forgot-password/', forgot_password),
-    path('api/add_work_log/', add_work_log),
+    path('api/login/', login_user, name='login'),
+    path('api/register/', register_user, name='register'),
+    path('api/forgot-password/', forgot_password, name='forgot-password'),
     path('api/worklogs/', worklogs, name='worklogs'),
+    path('api/worklogs/add/', add_work_log, name='add-work-log'),
+    path('api/worklogs/delete/<int:log_id>/', delete_work_log, name='delete-work-log'),
+
+    path('api/admin/worklogs/', AdminWorkLogView.as_view(), name='admin-worklogs'),
+    path('api/admin/users/', AdminUserManagementView.as_view(), name='admin-users'),
+    path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
+
+    path('api-auth/', include('rest_framework.urls')),  # Add Django REST framework login/logout views
 ]

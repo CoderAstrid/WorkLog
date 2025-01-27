@@ -1,23 +1,27 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import UserAuth from '../components/UserAuth.vue';
-import WorkLog from '@/components/WorkLog.vue';
-import AdminDashboard from '@/components/admin/AdminDashboard.vue';
-import MyAccount from '@/components/admin/MyAccount.vue';
-import UserManagement  from '@/components/admin/UserManagement.vue';
-import WorkLogs from '@/components/admin/WorkLogs.vue';
+import WorkLog from '../components/WorkLog.vue';
+import AdminDashboard from '../components/admin/AdminDashboard.vue';
+import MyAccount from '../components/admin/MyAccount.vue';
+import UserManagement  from '../components/admin/UserManagement.vue';
+import WorkLogs from '../components/admin/WorkLogs.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: '/login' },   // Redirect to login by default
   { path: '/login', component: UserAuth },
   { path: '/worklog', component: WorkLog },
-  { path: "/admin", component: AdminDashboard, meta: { requiresAdmin: true }},
-  { path: '/admin/account', component: MyAccount },
-  { path: '/admin/users', component: UserManagement },
-  { path: '/admin/logs', component: WorkLogs },
-  { path: '*', redirect: '/login' }, // Catch-all unknown routes
+  { 
+    path: '/admin', 
+    component: AdminDashboard, 
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  { path: '/admin/account', component: MyAccount, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/admin/users', component: UserManagement, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/admin/worklogs', component: WorkLogs, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '*', redirect: '/login' }  // Catch-all unknown routes
 ];
 
 const router = new VueRouter({
@@ -30,13 +34,20 @@ router.beforeEach((to, from, next) => {
   const isAdmin = localStorage.getItem("role") === "admin";
 
   if (!token && to.path !== '/login') {
+    // Redirect unauthenticated users to login page
+    next("/login");
+  } else if (token && to.path === '/login') {
+    // Redirect authenticated users away from login page
+    next("/worklog");
+  } else if (to.meta.requiresAuth && !token) {
+    // Protect authenticated routes
     next("/login");
   } else if (to.meta.requiresAdmin && !isAdmin) {
-    next("/login");
+    // Protect admin routes
+    next("/worklog");
   } else {
     next();
   }
 });
 
 export default router;
-

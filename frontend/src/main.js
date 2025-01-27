@@ -1,3 +1,5 @@
+// main.js
+
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -8,11 +10,12 @@ import './assets/style.css';
 const http = axios.create({
     baseURL: 'http://localhost:8000/api/',
     headers: {
-        'Content-Type': 'application/json'
-    }
+        'Content-Type': 'application/json',
+    },
 });
 
-http.interceptors.request.use(config => {
+// Attach token to requests dynamically
+http.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Token ${token}`;
@@ -27,5 +30,5 @@ Vue.config.productionTip = false;
 new Vue({
     vuetify,
     router,
-    render: h => h(App),
+    render: (h) => h(App),
 }).$mount('#app');

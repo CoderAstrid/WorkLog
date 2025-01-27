@@ -29,8 +29,9 @@
     },
     async mounted() {
       try {
+        const token = localStorage.getItem('token');
         const response = await this.$http.get('admin/worklogs/', {
-          headers: { Authorization: `Token ${localStorage.getItem('token')}` },
+            headers: { Authorization: `Token ${token}` }
         });
         this.workLogs = response.data;
       } catch (error) {

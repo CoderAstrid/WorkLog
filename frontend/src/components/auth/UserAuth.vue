@@ -22,6 +22,7 @@
             <v-form @submit.prevent="register">
               <v-text-field v-model="registerData.username" label="Username" required></v-text-field>
               <v-text-field v-model="registerData.email" label="Email" type="email" required></v-text-field>
+              <v-text-field v-model="registerData.role" label="Role" required></v-text-field>
               <v-text-field v-model="registerData.password" label="Password" type="password" required></v-text-field>
               <v-btn type="submit" color="primary" block>Register</v-btn>
             </v-form>

@@ -27,9 +27,9 @@
   </template>
   
   <script>
-  import WorkLogs from "@/components/admin/WorkLogs.vue";
-  import UserManagement from "@/components/admin/UserManagement.vue";
-  import MyAccount from "@/components/admin/MyAccount.vue";
+  import WorkLogs from "@/components/dashboard/WorkLogs.vue";
+  import UserManagement from "@/components/dashboard/UserManagement.vue";
+  import MyAccount from "@/components/dashboard/MyAccount.vue";
   
   export default {
     components: {

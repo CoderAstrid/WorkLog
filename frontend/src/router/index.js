@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import UserAuth from '../components/UserAuth.vue';
-import WorkLog from '../components/WorkLog.vue';
-import AdminDashboard from '../components/admin/AdminDashboard.vue';
-import MyAccount from '../components/admin/MyAccount.vue';
-import UserManagement  from '../components/admin/UserManagement.vue';
-import WorkLogs from '../components/admin/WorkLogs.vue';
+import UserAuth from '../components/auth/UserAuth.vue';
+import WorkLog from '../components/logs/WorkLog.vue';
+import AdminDashboard from '../components/dashboard/AdminDashboard.vue';
+import MyAccount from '../components/dashboard/MyAccount.vue';
+import UserManagement  from '../components/dashboard/UserManagement.vue';
+import WorkLogs from '../components/dashboard/WorkLogs.vue';
 
 Vue.use(VueRouter);
 
@@ -44,7 +44,7 @@ router.beforeEach((to, from, next) => {
     next("/login");
   } else if (to.meta.requiresAdmin && !isAdmin) {
     // Protect admin routes
-    next("/worklog");
+    next("/login");
   } else {
     next();
   }

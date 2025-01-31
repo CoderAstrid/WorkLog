@@ -1,10 +1,10 @@
 from django.db import models
 
 # Create your models here.
-from django.contrib.auth.models import User
+from users.models import CustomUser
 
 class WorkLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     date = models.DateField()
     content = models.TextField()
     notes = models.TextField(blank=True, null=True)

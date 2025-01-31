@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from .models import CustomUser
+from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 import uuid
 from django.http import JsonResponse
@@ -87,7 +89,7 @@ def reset_password(request, token):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_users(request):
-    users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'is_staff')
+    users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'role')
     return JsonResponse(list(users), safe=False)
 
 @api_view(['GET'])
@@ -98,3 +100,28 @@ def admin_profile(request):
         "email": request.user.email
     }
     return JsonResponse(admin_data)
+
+@api_view(["GET", "PUT"])
+@permission_classes([IsAuthenticated])
+def user_profile(request):
+    """Handles retrieving and updating user profiles"""
+    user = request.user
+
+    if request.method == "GET":
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": "admin" if user.is_staff else "user"
+        })
+
+    elif request.method == "PUT":
+        data = request.data
+        user.username = data.get("username", user.username)
+        user.email = data.get("email", user.email)
+
+        if "password" in data and data["password"]:
+            user.set_password(data["password"])
+
+        user.save()
+        return Response({"message": "Profile updated successfully"})

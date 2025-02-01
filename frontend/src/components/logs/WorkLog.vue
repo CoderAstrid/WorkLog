@@ -1,6 +1,6 @@
 <template>
-  <v-container class="green-background fill-height d-flex align-center justify-center">
-    <v-card class="pa-5" max-width="900">
+  <v-container fluid class="pa-4">
+    <v-card>
       <v-tabs v-model="tab">
         <v-tab>Work Logs</v-tab>
         <v-tab>My Account</v-tab>
@@ -75,9 +75,9 @@ export default {
       lastAddedDate: new Date(),
       tab: 0,      
       headers: [
-        { text: "Date", value: "date" },
-        { text: "Work Content", value: "content" },
-        { text: "Notes", value: "notes" },
+        { text: "Date", value: "date" , width: "120px"},
+        { text: "Work Content", value: "content", width: "auto" },
+        { text: "Notes", value: "notes", width: "auto" },
       ],
     };
   },
@@ -183,11 +183,8 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-.green-background {
-  background-color: #4CAF50;
-  padding: 20px;
-  height: 100vh;
+.v-container {
+  min-height: 100vh;
 }
 </style>

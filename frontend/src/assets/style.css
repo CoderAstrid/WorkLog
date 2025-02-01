@@ -4,4 +4,16 @@ body {
   .v-data-table {
     border: 1px solid red;
   }
+  .account-container {
+    display: flex;
+    justify-content: left;
+    padding-left: 7px; /* Increase left margin */
+  }
   
+  .account-card {
+    width: 400px; /* Set a reasonable width */
+  }
+  
+  .input-field {
+    max-width: 350px; /* Restrict input width */
+  }

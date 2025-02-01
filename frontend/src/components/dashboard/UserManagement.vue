@@ -16,10 +16,10 @@ export default {
     return {
       users: [],
       headers: [
-        { text: "ID", value: "id" },
-        { text: "Name", value: "username" },
-        { text: "Email", value: "email" },
-        { text: "Role", value: "role" },
+        { text: "ID", value: "id", width: "70px" },
+        { text: "Name", value: "username", width: "240px" },
+        { text: "Email", value: "email", width: "auto" },
+        { text: "Role", value: "role", width: "120px" },
       ],
     };
   },

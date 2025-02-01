@@ -1,16 +1,19 @@
 <template>
-  <v-card class="pa-5">
-    <v-card-title>{{ isAdmin ? "Admin Profile" : "My Account" }}</v-card-title>
-    
-    <v-form ref="form" @submit.prevent="updateProfile">
-      <v-text-field v-model="userProfile.username" label="Name" required></v-text-field>
-      <v-text-field v-model="userProfile.email" label="Email" required></v-text-field>
-      <v-text-field v-model="userProfile.password" label="New Password" type="password"></v-text-field>
+  <v-container class="account-container">
+    <v-card class="pa-5 account-card">
+      <v-card-title>{{ isAdmin ? "Admin Profile" : "My Account" }}</v-card-title>
+      
+      <v-form ref="form" @submit.prevent="updateProfile">
+        <v-text-field v-model="userProfile.username" label="Name" required></v-text-field>
+        <v-text-field v-model="userProfile.email" label="Email" required></v-text-field>
+        <v-text-field v-model="userProfile.password" label="New Password" type="password"></v-text-field>
 
-      <v-btn color="primary" type="submit">Save Changes</v-btn>
-      <v-btn color="red" class="ml-2" @click="resetPassword">Reset Password</v-btn>
-    </v-form>
-  </v-card>
+        <v-btn color="primary" type="submit">Save Changes</v-btn>
+        <v-btn color="red" class="ml-2" @click="resetPassword">Reset Password</v-btn>
+      </v-form>
+    </v-card>
+  </v-container>
+  
 </template>
 
 <script>

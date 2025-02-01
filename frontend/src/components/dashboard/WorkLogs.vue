@@ -20,10 +20,11 @@
       return {
         workLogs: [],
         headers: [
-          { text: "Date", value: "date" },
-          { text: "User", value: "user__username" },  // ✅ Change value to user__username
-          { text: "Work Content", value: "content" },
-          { text: "Actions", value: "actions", sortable: false },
+          { text: "Date", value: "date", width: "120px" },
+          { text: "User", value: "user__username", width: "240px" },  // ✅ Change value to user__username
+          { text: "Work Content", value: "content", width: "auto" },
+          { text: "Notes", value: "notes", width: "auto" },
+          { text: "Actions", value: "actions", sortable: false, width: "120px" },
         ],
       };
     },

@@ -1,6 +1,6 @@
 <template>
-    <v-container class="fill-height d-flex align-center justify-center">
-      <v-card class="pa-5" max-width="1200">
+    <v-container fluid class="pa-4">
+      <v-card>
         <v-toolbar flat color="primary" dark>
           <v-toolbar-title>Administrator Dashboard</v-toolbar-title>
         </v-toolbar>

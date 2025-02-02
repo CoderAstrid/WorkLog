@@ -6,6 +6,7 @@ import router from './router';
 import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import './assets/style.css';
+import '@mdi/font/css/materialdesignicons.css'; // Ensure MDI icons are loaded
 
 const http = axios.create({
     baseURL: 'http://localhost:8000/api/',

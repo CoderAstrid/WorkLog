@@ -19,7 +19,7 @@ export default {
         { text: "ID", value: "id", width: "70px" },
         { text: "Name", value: "username", width: "240px" },
         { text: "Email", value: "email", width: "auto" },
-        { text: "Role", value: "role", width: "120px" },
+        { text: "Admin", value: "is_staff" },  // ✅ Show Admin column
       ],
     };
   },

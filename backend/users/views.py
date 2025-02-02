@@ -1,3 +1,5 @@
+from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 # from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -38,25 +40,40 @@ def login_user(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user(request):
-    """Registers a new user, ensuring no duplicate admin accounts."""    
-    existing_admin = CustomUser.objects.filter(is_staff=True).exists()
-    username = request.data.get('username')
+    """Registers a new user, ensuring only one admin can be created automatically."""
+    
+    username = request.data.get("username", "").strip()
+    email = request.data.get("email", "").strip()
+    password = request.data.get("password", "").strip()
+
+    # Check if username already exists
     if CustomUser.objects.filter(username=username).exists():
-        return Response({"error": "This ID is already taken"}, status=400)
-    if request.data.get('is_admin') and existing_admin:
-        return Response({"error": "Admin already exists"}, status=400)
+        return Response({"error": "This ID is already taken."}, status=400)
 
-    if CustomUser.objects.filter(username=request.data['username']).exists():
-        return Response({"error": "User with this ID already exists"}, status=400)
+    # Ensure no duplicate admin accounts
+    if CustomUser.objects.filter(is_staff=True).count() >= 1:
+        return Response({"error": "Only one admin accounts are allowed."}, status=400)
 
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        if request.data.get('is_admin'):
+    try:
+        # Create a new user
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # Automatically set the first registered user as an admin
+        if not CustomUser.objects.filter(is_staff=True).exists():
             user.is_staff = True
+            user.is_superuser = True
             user.save()
-        return Response({"message": "User registered successfully"}, status=201)
-    return Response(serializer.errors, status=400)
+
+        return Response({"message": "User registered successfully."}, status=201)
+    except IntegrityError:
+        return Response({"error": "User with this email already exists."}, status=400)
+    except ValidationError as e:
+        return Response({"error": str(e)}, status=400)
+    
 
 @api_view(['POST'])
 def forgot_password(request):
@@ -89,7 +106,7 @@ def reset_password(request, token):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_users(request):
-    users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'role')
+    users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'is_staff')
     return JsonResponse(list(users), safe=False)
 
 @api_view(['GET'])

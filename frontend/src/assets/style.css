@@ -1,19 +1,33 @@
 body {
-    font-family: Arial, sans-serif;
-  }
-  .v-data-table {
-    border: 1px solid red;
-  }
-  .account-container {
-    display: flex;
-    justify-content: left;
-    padding-left: 7px; /* Increase left margin */
-  }
-  
-  .account-card {
-    width: 400px; /* Set a reasonable width */
-  }
-  
-  .input-field {
-    max-width: 350px; /* Restrict input width */
-  }
+  font-family: Arial, sans-serif;
+}
+.v-data-table {
+  border: 1px solid red;
+}
+.account-container {
+  display: flex;
+  justify-content: left;
+  padding-left: 7px; /* Increase left margin */
+}
+
+.account-card {
+  width: 400px; /* Set a reasonable width */
+}
+
+.input-field {
+  max-width: 350px; /* Restrict input width */
+}
+.v-input--selection-controls {
+  display: flex !important;
+  align-items: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.v-icon.mdi-checkbox-blank-outline {
+  color: #424242 !important;  /* Default Vuetify color */
+}
+
+.v-icon.mdi-checkbox-marked {
+  color: #1976D2 !important;  /* Vuetify primary blue */
+}

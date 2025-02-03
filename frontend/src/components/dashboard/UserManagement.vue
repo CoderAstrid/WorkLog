@@ -5,7 +5,13 @@
       <template v-slot:item.full_name="{ item }">
         <span>{{ item.first_name }} {{ item.last_name }}</span>
       </template>
-      
+      <template v-slot:item.is_staff="{ item }">
+        <v-checkbox
+          :input-value="item.is_staff"
+          readonly
+          disabled
+        ></v-checkbox>
+      </template>
       <template v-slot:item.actions="{ item }">
         <v-btn color="primary" @click="editUser(item)">Edit</v-btn>
         <v-btn color="error" @click="resetPassword(item)">Reset Password</v-btn>

@@ -4,10 +4,16 @@
       <v-card-title>{{ isAdmin ? "Admin Profile" : "My Account" }}</v-card-title>
       
       <v-form ref="form" @submit.prevent="updateProfile">
-        <v-text-field v-model="userProfile.username" label="User ID" required></v-text-field>
+        <v-text-field v-model="userProfile.username" label="User ID" required readonly></v-text-field>
         <v-text-field v-model="userProfile.first_name" label="First Name" required></v-text-field>
         <v-text-field v-model="userProfile.last_name" label="Last Name" required></v-text-field>
         <v-text-field v-model="userProfile.email" label="Email" required></v-text-field>
+        <v-checkbox
+          :input-value="userProfile.role === 'admin'"
+          readonly
+          disabled
+          label="Admin"
+        ></v-checkbox>
         <v-text-field v-model="userProfile.password" label="New Password" type="password"></v-text-field>
 
         <v-btn color="primary" type="submit">Save Changes</v-btn>
@@ -31,6 +37,7 @@ export default {
         last_name: "",
         email: "",
         password: "",
+        role: "user",  // Default role to "user"
       },
     };
   },
@@ -50,6 +57,7 @@ export default {
           first_name: response.data.first_name,
           last_name: response.data.last_name,
           email: response.data.email,
+          role: response.data.role, // ✅ Assign the correct role (admin/user)
           password: "", // Leave blank to prevent overwriting
         };
       } catch (error) {

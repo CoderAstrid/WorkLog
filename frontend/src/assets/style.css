@@ -31,3 +31,7 @@ body {
 .v-icon.mdi-checkbox-marked {
   color: #1976D2 !important;  /* Vuetify primary blue */
 }
+.align-checkbox {
+  display: flex;
+  justify-content: flex-end;
+}

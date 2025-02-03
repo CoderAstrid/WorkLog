@@ -25,7 +25,24 @@ SECRET_KEY = 'django-insecure-30!!j1^c1omm5qbqtz6n(4_o4+4!m)ri_u=usf!kjltyey9tx8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+import socket
+import psutil  # Install with `pip install psutil`
+
+def get_real_local_ip():
+    """Detects the actual network interface's IPv4 address, ignoring VPNs and virtual interfaces."""
+    try:
+        for iface, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET and not iface.lower().startswith(("vmware", "virtual", "vpn", "loopback")):
+                    return addr.address  # Return the first real network interface
+    except Exception:
+        pass
+    return "127.0.0.1"  # Fallback to localhost if detection fails
+
+# Get the correct network IP
+REAL_LOCAL_IP  = get_real_local_ip()
+print(REAL_LOCAL_IP )
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', REAL_LOCAL_IP , '.local', '192.168.101.*']
 
 
 # Application definition
@@ -72,6 +89,7 @@ AUTHENTICATION_BACKENDS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",  # Allow frontend access
+    "http://{real_ip}:8000",
 ]
 
 ROOT_URLCONF = 'backend.urls'

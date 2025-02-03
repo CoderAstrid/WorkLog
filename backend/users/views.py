@@ -45,14 +45,18 @@ def register_user(request):
     username = request.data.get("username", "").strip()
     email = request.data.get("email", "").strip()
     password = request.data.get("password", "").strip()
+    is_admin = request.data.get("is_admin", False)  # Ensure admin checkbox is processed
+
+    print(f"Registering User: {username}, Email: {email}, is_admin: {is_admin}")
 
     # Check if username already exists
     if CustomUser.objects.filter(username=username).exists():
         return Response({"error": "This ID is already taken."}, status=400)
 
-    # Ensure no duplicate admin accounts
-    if CustomUser.objects.filter(is_staff=True).count() >= 1:
-        return Response({"error": "Only one admin accounts are allowed."}, status=400)
+    # Ensure only one admin exists
+    admin_exists = CustomUser.objects.filter(is_staff=True).exists()
+    if is_admin and admin_exists:
+        return Response({"error": "Only one admin account is allowed."}, status=400)
 
     try:
         # Create a new user
@@ -61,9 +65,10 @@ def register_user(request):
             email=email,
             password=password
         )
-
-        # Automatically set the first registered user as an admin
-        if not CustomUser.objects.filter(is_staff=True).exists():
+        print(user)
+        # Set as admin only if:
+        # 1️⃣ The checkbox was checked **AND** it's the first admin user
+        if is_admin and not admin_exists:
             user.is_staff = True
             user.is_superuser = True
             user.save()
@@ -73,7 +78,8 @@ def register_user(request):
         return Response({"error": "User with this email already exists."}, status=400)
     except ValidationError as e:
         return Response({"error": str(e)}, status=400)
-    
+        
+
 
 @api_view(['POST'])
 def forgot_password(request):

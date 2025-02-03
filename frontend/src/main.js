@@ -7,9 +7,9 @@ import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import './assets/style.css';
 import '@mdi/font/css/materialdesignicons.css'; // Ensure MDI icons are loaded
-
+       
 const http = axios.create({
-    baseURL: 'http://localhost:8000/api/',
+    baseURL: 'http://192.168.101.81:8000/api/',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -23,8 +23,8 @@ http.interceptors.request.use((config) => {
     }
     return config;
 });
-
 Vue.prototype.$http = http;
+
 
 Vue.config.productionTip = false;
 

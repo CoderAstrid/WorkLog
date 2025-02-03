@@ -27,7 +27,8 @@
                 label="Register as Admin"
                 color="primary"
                 hide-details
-                dense
+                dense  
+                class="align-checkbox"              
               ></v-checkbox>
               <v-text-field v-model="registerData.password" label="Password" type="password" required></v-text-field>
               <v-btn type="submit" color="primary" block>Register</v-btn>

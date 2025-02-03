@@ -27,14 +27,15 @@ def admin_worklogs(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_worklog(request):
-    """Add a new work log for the logged-in user"""
-    data = request.data.copy()
-    data['user'] = request.user.id  # Set the user automatically
+    """Creates a new work log entry for the logged-in user."""
+    print(request)
+    data = request.data.copy()  # Make a mutable copy
     serializer = WorkLogSerializer(data=data)
 
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(user=request.user)  # ✅ Assign user instance, not ID
         return Response(serializer.data, status=201)
+
     return Response(serializer.errors, status=400)
 
 ### 🔹 3️⃣ Update an Existing Work Log

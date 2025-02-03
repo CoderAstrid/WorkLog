@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="pa-4">
     <v-card>
+      <!-- Tabs for Work Log & My Account -->
       <v-tabs v-model="tab">
         <v-tab>Work Logs</v-tab>
         <v-tab>My Account</v-tab>
@@ -8,10 +9,26 @@
       <v-tabs-items v-model="tab">
         <!-- Work Logs Tab -->
         <v-tab-item>
+          <v-row class="align-center mb-2">
+            <v-col cols="6">
+              <h3 class="ml-3">Work Logs of {{ username }}</h3>
+            </v-col>
+            <v-col cols="6" class="text-right">
+              <v-btn
+                color="error"
+                :disabled="selectedLogs.length === 0"
+                @click="confirmDeleteDialog = true"
+              >
+                Delete Selected
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-data-table
+            v-model="selectedLogs"
             :headers="headers"
             :items="workLogs"
             item-value="id"
+            show-select
             class="elevation-1 mt-4"
             dense
           >
@@ -54,6 +71,20 @@
             </template>
           </v-data-table>
           <v-btn color="success" class="mt-4" @click="addPreviousDay">Add Previous Day</v-btn>
+          <!-- 🔴 Delete Confirmation Dialog -->
+          <v-dialog v-model="confirmDeleteDialog" max-width="400px">
+            <v-card>
+              <v-card-title class="headline">Confirm Deletion</v-card-title>
+              <v-card-text>
+                Are you sure you want to delete the selected work logs?
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="grey" text @click="confirmDeleteDialog = false">Cancel</v-btn>
+                <v-btn color="red" text @click="deleteSelectedLogs">Delete</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-tab-item>
 
         <!-- My Account Tab -->
@@ -76,9 +107,12 @@ export default {
     return {
       username: localStorage.getItem("username") || "User",
       workLogs: [],
+      selectedLogs: [],  // Store selected log IDs
+      confirmDeleteDialog: false,  // ✅ Add this line to fix the warning
       lastAddedDate: new Date(),
       tab: 0,      
       headers: [
+        { text: "", value: "data-table-select", width: "30px" },  // Checkbox Column
         { text: "Date", value: "date" , width: "120px"},
         { text: "Work Content", value: "content", width: "auto" },
         { text: "Notes", value: "notes", width: "auto" },
@@ -86,8 +120,8 @@ export default {
     };
   },
   async mounted() {
-    this.fetchWorkLogs();
     this.fetchProfile();
+    this.fetchWorkLogs();    
   },
   methods: {
     async fetchWorkLogs() {
@@ -105,6 +139,8 @@ export default {
         const response = await this.$http.get("user/profile/", {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
+        // Correctly assign the username from API response
+        this.username = response.data.username;
         // Store correct user data
         this.userProfile = {
           username: response.data.username,
@@ -151,37 +187,48 @@ export default {
       });
     },
     async updateWorkLog(item) {
+      const token = localStorage.getItem("token");
       try {
         if (item.id) {
           // If ID exists, update existing log in DB
           await this.$http.put(`worklogs/${item.id}/update/`, item, {
-            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+            headers: { Authorization: `Token ${token}` },
           });
         } else {
           // If no ID, this is a new row -> Save it to DB for the first time
-          const response = await this.$http.post("worklogs/add/", item, {
-            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+          const response = await this.$http.post("worklogs/add/", {
+            date: item.date,
+            content: item.content,
+            notes: item.notes,
+          }, {
+            headers: { Authorization: `Token ${token}` },
           });
-          item.id = response.data.id; // Assign ID after DB save
+          item.id = response.data.id; // Assign ID after saving to DB
         }
       } catch (error) {
         console.error("Error updating work log:", error);
       }
     },
-    async deleteWorkLog(item) {
+    async deleteSelectedLogs() {
+      this.confirmDeleteDialog = false
+      if (!this.selectedLogs.length) return;
+
+      // const confirmed = confirm("Are you sure you want to delete the selected work logs?");
+      // if (!confirmed) return;
+
       try {
-        if (item.id) {
-          // Only delete from DB if it has an ID
-          await this.$http.delete(`worklogs/${item.id}/delete/`, {
+        for (const log of this.selectedLogs) {
+          if (!log.id) continue;  // ✅ Ensure only valid IDs are processed
+          await this.$http.delete(`worklogs/${log.id}/delete/`, {
             headers: { Authorization: `Token ${localStorage.getItem("token")}` },
           });
-          this.workLogs = this.workLogs.filter((log) => log.id !== item.id);
-        } else {
-          // If no ID, just remove it from frontend display
-          this.workLogs = this.workLogs.filter((log) => log !== item);
         }
+        
+        // Remove deleted logs from UI
+        this.workLogs = this.workLogs.filter(log => !this.selectedLogs.includes(log));
+        this.selectedLogs = []; // Clear selection
       } catch (error) {
-        console.error("Error deleting work log:", error);
+        console.error("Error deleting work logs:", error);
       }
     },
   },

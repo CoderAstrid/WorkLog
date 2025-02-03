@@ -1,26 +1,36 @@
 <template>
+  <div class="login-container">
+    <!-- Background Video -->
+    <video class="background-video" autoplay muted loop playsinline>
+      <source src="/videos/typing.mp4" type="video/mp4" />
+      Your browser does not support HTML5 video.
+    </video>
+    <!-- Dark Overlay -->
+    <div class="overlay"></div>
+    <!-- Centered Login Form -->
     <v-container class="fill-height d-flex align-center justify-center">
-      <v-card class="pa-5" max-width="400">
+      <v-card class="pa-5 login-form">
         <v-tabs v-model="tab">
           <v-tab>Login</v-tab>
           <v-tab>Register</v-tab>
           <v-tab>Forgot Password</v-tab>
         </v-tabs>
-  
         <v-tabs-items v-model="tab">
           <!-- Login Form -->
           <v-tab-item>
             <v-form @submit.prevent="login">
-              <v-text-field v-model="loginData.username" label="Username" required></v-text-field>
+              <v-text-field v-model="loginData.username" label="User ID" required></v-text-field>
               <v-text-field v-model="loginData.password" label="Password" type="password" required></v-text-field>
               <v-btn type="submit" color="primary" block>Login</v-btn>
             </v-form>
           </v-tab-item>
-  
+
           <!-- Registration Form -->
           <v-tab-item>
             <v-form @submit.prevent="register">
-              <v-text-field v-model="registerData.username" label="Username" required></v-text-field>
+              <v-text-field v-model="registerData.username" label="User ID" required></v-text-field>
+              <v-text-field v-model="registerData.first_name" label="First Name" required></v-text-field>
+              <v-text-field v-model="registerData.last_name" label="Last Name" required></v-text-field>
               <v-text-field v-model="registerData.email" label="Email" type="email" required></v-text-field>
               <v-checkbox
                 v-model="registerData.is_admin"
@@ -34,7 +44,7 @@
               <v-btn type="submit" color="primary" block>Register</v-btn>
             </v-form>
           </v-tab-item>
-  
+
           <!-- Forgot Password Form -->
           <v-tab-item>
             <v-form @submit.prevent="forgotPassword">
@@ -45,6 +55,7 @@
         </v-tabs-items>
       </v-card>
     </v-container>
+  </div>
   </template>
   
   <script>
@@ -97,4 +108,4 @@
     }
   };
   </script>
-  
+ 

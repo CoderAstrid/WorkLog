@@ -4,10 +4,17 @@
     <v-app-bar app color="primary" dark>
       <v-toolbar-title>Company Work Log</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="isLoggedIn" to="/worklog">Work Log</v-btn>
-      <v-btn v-if="isAdmin" to="/admin">Admin Panel</v-btn>
-      <v-btn v-if="isLoggedIn" @click="logout">Logout</v-btn>
-      <v-btn v-else to="/login">Login</v-btn>
+
+      <template v-if="isLoggedIn">
+        <template v-if="isAdmin">
+          <v-btn to="/admin">Admin Panel</v-btn>
+          <v-btn to="/worklog">Work Log</v-btn>
+          <v-btn @click="logout">Logout</v-btn>
+        </template> 
+        <template v-else>
+          <v-btn @click="logout">Logout</v-btn>
+        </template>
+      </template>      
     </v-app-bar>
 
     <!-- Main Content -->

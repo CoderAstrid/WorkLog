@@ -19,7 +19,7 @@ def get_worklogs(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_worklogs(request):
-    logs = WorkLog.objects.all().values('id', 'user__username', 'date', 'content', 'notes')
+    logs = WorkLog.objects.all().values('id', 'user__username', 'user__first_name', 'user__last_name', 'date', 'content', 'notes')
     return JsonResponse(list(logs), safe=False)
 
 ### 🔹 2️⃣ Create a New Work Log

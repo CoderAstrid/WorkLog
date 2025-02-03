@@ -16,8 +16,10 @@ export default {
     return {
       users: [],
       headers: [
-        { text: "ID", value: "id", width: "70px" },
-        { text: "Name", value: "username", width: "240px" },
+        { text: "No", value: "id", width: "70px" },
+        { text: "ID", value: "username", width: "240px" },
+        { text: "First Name", value: "first_name", width: "240px" },
+        { text: "Last Name", value: "last_name", width: "240px" },        
         { text: "Email", value: "email", width: "auto" },
         { text: "Admin", value: "is_staff" },  // ✅ Show Admin column
       ],

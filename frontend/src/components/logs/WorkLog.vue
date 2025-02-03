@@ -29,24 +29,28 @@
 
             <!-- Editable Work Content Column -->
             <template v-slot:item.content="{ item }">
-              <v-text-field
+              <v-textarea
                 v-model="item.content"
                 density="compact"
                 variant="outlined"
                 hide-details
+                auto-grow
+                rows="2"
                 @change="updateWorkLog(item)"
-              ></v-text-field>
+              ></v-textarea>
             </template>
 
             <!-- Editable Notes Column -->
             <template v-slot:item.notes="{ item }">
-              <v-text-field
+              <v-textarea
                 v-model="item.notes"
                 density="compact"
                 variant="outlined"
                 hide-details
+                auto-grow
+                rows="2"
                 @change="updateWorkLog(item)"
-              ></v-text-field>
+              ></v-textarea>
             </template>
           </v-data-table>
           <v-btn color="success" class="mt-4" @click="addPreviousDay">Add Previous Day</v-btn>

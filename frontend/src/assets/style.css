@@ -35,3 +35,25 @@ body {
   display: flex;
   justify-content: flex-end;
 }
+/* Make sure the video is visible */
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5; /* Ensure it's not fully transparent */
+  z-index: -2;
+}
+
+/* Make sure no other elements are covering it */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Slightly darker for contrast */
+  z-index: -1;
+}

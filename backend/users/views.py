@@ -45,6 +45,8 @@ def register_user(request):
     username = request.data.get("username", "").strip()
     email = request.data.get("email", "").strip()
     password = request.data.get("password", "").strip()
+    first_name = request.data.get("first_name", "").strip()
+    last_name = request.data.get("last_name", "").strip()
     is_admin = request.data.get("is_admin", False)  # Ensure admin checkbox is processed
 
     print(f"Registering User: {username}, Email: {email}, is_admin: {is_admin}")
@@ -63,6 +65,8 @@ def register_user(request):
         user = CustomUser.objects.create_user(
             username=username,
             email=email,
+            first_name=first_name,
+            last_name=last_name,
             password=password
         )
         print(user)
@@ -112,15 +116,19 @@ def reset_password(request, token):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_users(request):
-    users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'is_staff')
+    users = CustomUser.objects.all().values('id', 'username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff')
     return JsonResponse(list(users), safe=False)
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_profile(request):
     admin_data = {
+        "id": request.user.id,
         "username": request.user.username,
-        "email": request.user.email
+        "first_name": request.user.first_name,
+        "last_name": request.user.last_name,
+        "email": request.user.email,
+        "role": "admin" if request.user.is_staff else "user"
     }
     return JsonResponse(admin_data)
 
@@ -134,6 +142,8 @@ def user_profile(request):
         return Response({
             "id": user.id,
             "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
             "email": user.email,
             "role": "admin" if user.is_staff else "user"
         })
@@ -142,7 +152,8 @@ def user_profile(request):
         data = request.data
         user.username = data.get("username", user.username)
         user.email = data.get("email", user.email)
-
+        user.first_name = data.get("first_name", user.first_name)
+        user.last_name = data.get("last_name", user.last_name)
         if "password" in data and data["password"]:
             user.set_password(data["password"])
 

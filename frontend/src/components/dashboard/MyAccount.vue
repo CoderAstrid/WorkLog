@@ -4,7 +4,9 @@
       <v-card-title>{{ isAdmin ? "Admin Profile" : "My Account" }}</v-card-title>
       
       <v-form ref="form" @submit.prevent="updateProfile">
-        <v-text-field v-model="userProfile.username" label="Name" required></v-text-field>
+        <v-text-field v-model="userProfile.username" label="User ID" required></v-text-field>
+        <v-text-field v-model="userProfile.first_name" label="First Name" required></v-text-field>
+        <v-text-field v-model="userProfile.last_name" label="Last Name" required></v-text-field>
         <v-text-field v-model="userProfile.email" label="Email" required></v-text-field>
         <v-text-field v-model="userProfile.password" label="New Password" type="password"></v-text-field>
 
@@ -25,6 +27,8 @@ export default {
     return {
       userProfile: {
         username: "",
+        first_name: "",
+        last_name: "",
         email: "",
         password: "",
       },
@@ -43,6 +47,8 @@ export default {
 
         this.userProfile = {
           username: response.data.username,
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
           email: response.data.email,
           password: "", // Leave blank to prevent overwriting
         };

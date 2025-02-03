@@ -8,17 +8,18 @@
         class="elevation-1"
         dense
       >
-        <!-- Work Content Column (Multi-line Display) -->
+        <template v-slot:item.full_name="{ item }">
+          <span>{{ item.first_name }} {{ item.last_name }}</span>
+        </template>
+
         <template v-slot:item.content="{ item }">
           <pre class="multiline-text">{{ item.content }}</pre>
         </template>
 
-        <!-- Notes Column (Multi-line Display) -->
         <template v-slot:item.notes="{ item }">
           <pre class="multiline-text">{{ item.notes }}</pre>
         </template>
 
-        <!-- Actions Column -->
         <template v-slot:item.actions="{ item }">
           <v-btn color="primary" @click="editLog(item)">Edit</v-btn>
         </template>
@@ -44,9 +45,8 @@
         workLogs: [],
         headers: [
           { text: "Date", value: "date", width: "120px" },
-          { text: "ID", value: "user__username", width: "240px" },  // ✅ Change value to user__username
-          { text: "First Name", value: "user__first_name", width: "240px" },  // ✅ Change value to user__username
-          { text: "Last Name", value: "user__last_name", width: "240px" },  // ✅ Change value to user__username          
+          { text: "ID", value: "username", width: "240px" },  // ✅ Change value to user__username
+          { text: "Full Name", value: "full_name", width: "240px" },  // ✅ Change value to user__username    
           { text: "Work Content", value: "content", width: "auto" },
           { text: "Notes", value: "notes", width: "auto" },
           { text: "Actions", value: "actions", sortable: false, width: "120px" },

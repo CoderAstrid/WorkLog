@@ -34,14 +34,31 @@
           >
             <!-- Editable Date Column -->
             <template v-slot:item.date="{ item }">
-              <v-text-field
-                v-model="item.date"
-                type="date"
-                density="compact"
-                variant="outlined"
-                hide-details
-                @change="updateWorkLog(item)"
-              ></v-text-field>
+              <v-menu
+                v-model="item.datePicker"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="item.date"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    dense
+                    variant="outlined"
+                    hide-details
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="item.date"
+                  :max="today"
+                  :allowed-dates="allowedDates"
+                  @input="updateWorkLog(item)"
+                ></v-date-picker>
+              </v-menu>
             </template>
 
             <!-- Editable Work Content Column -->
@@ -117,6 +134,7 @@ export default {
         { text: "Work Content", value: "content", width: "auto" },
         { text: "Notes", value: "notes", width: "auto" },
       ],
+      today: new Date().toISOString().split("T")[0],
     };
   },
   async mounted() {
@@ -124,6 +142,12 @@ export default {
     this.fetchWorkLogs();    
   },
   methods: {
+    allowedDates(date) {
+      return (
+        date <= this.today && // Prevent future dates
+        !this.workLogs.some((log) => log.date === date) // Prevent duplicate dates
+      );
+    },
     async fetchWorkLogs() {
       try {
         const response = await this.$http.get("worklogs/", {
@@ -173,12 +197,18 @@ export default {
       }
     },
     addPreviousDay() {
-      // Generate a new previous date (without saving to DB)
-      const previousDate = new Date(this.lastAddedDate);
-      previousDate.setDate(previousDate.getDate() - 1);
+      const today = new Date();
+      let previousDate = new Date(this.lastAddedDate);
+      
+      do {
+        previousDate.setDate(previousDate.getDate() - 1);
+      } while (
+        this.workLogs.some(log => log.date === previousDate.toISOString().split("T")[0]) || // Rule 2: Avoid duplicate dates
+        previousDate >= today // Rule 1: Must be earlier than today
+      );
+
       this.lastAddedDate = previousDate;
 
-      // Add a blank log entry ONLY to the displayed table
       this.workLogs.push({
         id: null, // No ID since it's not in DB yet
         date: previousDate.toISOString().split("T")[0],
@@ -187,6 +217,22 @@ export default {
       });
     },
     async updateWorkLog(item) {
+      const today = new Date().toISOString().split("T")[0]; // Get today's date
+      const newDate = item.date;
+
+      // Rule 1: The new date cannot be after today
+      if (newDate > today) {
+        alert("The date cannot be in the future.");
+        item.date = today; // Reset to today's date
+        return;
+      }
+      
+      // Rule 2: The new date must not overlap with any of the existing recorded dates
+      if (this.workLogs.some(log => log.id !== item.id && log.date === newDate)) {
+        alert("A record with this date already exists. Please choose a different date.");
+        return;
+      }
+
       const token = localStorage.getItem("token");
       try {
         if (item.id) {

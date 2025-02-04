@@ -1,7 +1,7 @@
 <template>
     <v-container fluid class="pa-4">
       <v-card>
-        <v-toolbar flat color="primary" dark>
+        <v-toolbar flat color="green" dark>
           <v-toolbar-title>Administrator Dashboard</v-toolbar-title>
         </v-toolbar>
   

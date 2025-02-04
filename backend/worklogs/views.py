@@ -19,7 +19,7 @@ def get_worklogs(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_worklogs(request):
-    logs = WorkLog.objects.select_related("user").all()
+    logs = WorkLog.objects.select_related("user").all().order_by('-date')
     serializer = WorkLogSerializer(logs, many=True)
     return Response(serializer.data)
 
@@ -63,9 +63,9 @@ def delete_worklog(request, log_id):
 @permission_classes([IsAuthenticated])
 def worklogs(request):
     if request.user.is_staff:
-        logs = WorkLog.objects.all()
+        logs = WorkLog.objects.all().order_by('-date')
     else:
-        logs = WorkLog.objects.filter(user=request.user)
+        logs = WorkLog.objects.filter(user=request.user).order_by('-date')
 
     if request.method == 'GET':
         serializer = WorkLogSerializer(logs, many=True)

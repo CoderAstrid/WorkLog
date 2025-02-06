@@ -6,6 +6,51 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import WorkLog
 from .serializers import WorkLogSerializer
+from django.http import HttpResponse
+import pandas as pd
+import openpyxl
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def export_worklogs(request):
+    """Export selected work logs to an Excel file"""
+    
+    log_ids = request.data.get("selectedLogs", [])  # ✅ Expect only IDs
+
+    if not isinstance(log_ids, list) or not all(isinstance(id, int) for id in log_ids):
+        return HttpResponse("Invalid data format", status=400)  # ✅ Ensure it's a list of integers
+
+    logs = WorkLog.objects.filter(id__in=log_ids).select_related("user")
+
+    # Prepare data
+    data = [
+        {
+            "Date": log.date.strftime("%Y-%m-%d"),
+            "User ID": log.user.username,
+            "Full Name": f"{log.user.first_name} {log.user.last_name}",
+            "Work Content": log.content,
+            "Notes": log.notes
+        }
+        for log in logs
+    ]
+
+    df = pd.DataFrame(data)
+
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = 'attachment; filename="worklogs.xlsx"'
+
+    with pd.ExcelWriter(response, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="WorkLogs")
+        worksheet = writer.sheets["WorkLogs"]
+
+        # ✅ Format for multiline text in Excel
+        for i, col in enumerate(df.columns):
+            col_width = max(df[col].astype(str).apply(len).max(), len(col)) + 5
+            worksheet.column_dimensions[chr(65 + i)].width = col_width  # Adjust column width
+            for row in range(2, len(df) + 2):
+                worksheet.cell(row=row, column=i + 1).alignment = openpyxl.styles.Alignment(wrap_text=True)
+
+    return response
 
 ### 🔹 1️⃣ Fetch All Work Logs for the Logged-in User
 @api_view(['GET'])

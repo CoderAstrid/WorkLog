@@ -1,7 +1,19 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-card-title>All Work Logs</v-card-title>
+      <v-card-title>
+        All Work Logs
+        <v-spacer></v-spacer>
+
+        <!-- ✅ Export Button -->
+        <v-btn
+          color="success"
+          :disabled="selectedLogs.length === 0"
+          @click="exportWorkLogs"
+        >
+          Export to Excel
+        </v-btn>
+      </v-card-title>
       <v-data-table
         v-model="selectedLogs"
         :headers="headers"
@@ -23,20 +35,7 @@
           <pre class="multiline-text">{{ item.notes }}</pre>
         </template>
       </v-data-table>
-    </v-card>
-    <v-dialog v-model="confirmDeleteDialog" max-width="400px">
-      <v-card>
-        <v-card-title class="headline">Confirm Deletion</v-card-title>
-        <v-card-text>
-          Are you sure you want to delete the selected work logs?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" text @click="confirmDeleteDialog = false">Cancel</v-btn>
-          <v-btn color="red" text @click="deleteSelectedLogs">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    </v-card>    
   </v-container>
 </template>
 
@@ -77,6 +76,48 @@
         console.error('Error fetching work logs:', error);
       }
     },
+    methods: {
+      async exportWorkLogs() {
+        if (this.selectedLogs.length === 0) {
+          alert("Please select at least one log to export.");
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+
+          // ✅ Extract only IDs from selected work logs
+          const selectedLogIds = this.selectedLogs.map(log => log.id);
+
+          const response = await this.$http.post(
+            "admin/worklogs/export/",
+            { selectedLogs: selectedLogIds }, // ✅ Send only log IDs
+            {
+              headers: { Authorization: `Token ${token}` },
+              responseType: "blob", // ✅ Ensures proper file download
+            }
+          );
+
+          // ✅ Create & Trigger Download
+          const blob = new Blob([response.data], { type: response.headers["content-type"] });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "worklogs.xlsx");
+          document.body.appendChild(link);
+
+          setTimeout(() => {
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }, 100);
+
+          console.log("✅ Work logs exported successfully!");
+        } catch (error) {
+          console.error("❌ Error exporting work logs:", error);
+        }
+      },
+    }
   };
   </script>
   

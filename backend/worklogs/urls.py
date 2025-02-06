@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import get_worklogs, add_worklog, update_worklog, delete_worklog, admin_worklogs
+from .views import get_worklogs, add_worklog, update_worklog, delete_worklog, admin_worklogs, export_worklogs
 
 urlpatterns = [
     path('worklogs/', get_worklogs, name='get-worklogs'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('worklogs/<int:log_id>/delete/', delete_worklog, name='delete-worklog'),
 
     path('admin/worklogs/', admin_worklogs, name='admin-worklogs'),
+    path('admin/worklogs/export/', export_worklogs, name='export-worklogs'),  # ✅ Add export API
 ]

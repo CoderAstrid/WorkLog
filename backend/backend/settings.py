@@ -26,24 +26,39 @@ SECRET_KEY = 'django-insecure-30!!j1^c1omm5qbqtz6n(4_o4+4!m)ri_u=usf!kjltyey9tx8
 DEBUG = True
 
 import socket
-import psutil  # Install with `pip install psutil`
+import psutil
 
-def get_real_local_ip():
-    """Detects the actual network interface's IPv4 address, ignoring VPNs and virtual interfaces."""
+def get_real_local_ips():
+    """Finds all valid private IPv4 addresses (ignoring VPNs & virtual adapters)."""
+    ip_list = []
     try:
         for iface, addrs in psutil.net_if_addrs().items():
+            # ✅ Skip known virtual interfaces (VPNs, VirtualBox, etc.)
+            if iface.lower().startswith(("vmware", "virtual", "vpn", "loopback")):
+                continue
+
             for addr in addrs:
-                if addr.family == socket.AF_INET and not iface.lower().startswith(("vmware", "virtual", "vpn", "loopback")):
-                    return addr.address  # Return the first real network interface
-    except Exception:
-        pass
-    return "127.0.0.1"  # Fallback to localhost if detection fails
+                if addr.family == socket.AF_INET:  # IPv4 only
+                    ip = addr.address
 
-# Get the correct network IP
-REAL_LOCAL_IP  = get_real_local_ip()
-print(REAL_LOCAL_IP )
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', REAL_LOCAL_IP , '.local', '192.168.101.*']
+                    # ✅ Ensure it's a private IP (not a public/VPN IP)
+                    if ip.startswith(("192.168.", "10.", "172.16.", "172.17.", "172.18.", "172.19.", "172.20.",
+                                      "172.21.", "172.22.", "172.23.", "172.24.", "172.25.", "172.26.", "172.27.",
+                                      "172.28.", "172.29.", "172.30.", "172.31.")):
+                        ip_list.append(ip)  # ✅ Add valid private IP
 
+    except Exception as e:
+        print(f"⚠️ Error detecting IPs: {e}")
+
+    return ip_list if ip_list else ["127.0.0.1"]  # Fallback if detection fails
+
+# ✅ Get and print the best local IP
+REAL_LOCAL_IP = get_real_local_ips()
+print("🌍 Real Local IP:", REAL_LOCAL_IP)
+
+ALLOWED_HOSTS = get_real_local_ips() + ['127.0.0.1', 'localhost', '.local']
+
+print(ALLOWED_HOSTS)
 
 # Application definition
 

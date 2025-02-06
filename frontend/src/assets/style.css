@@ -35,34 +35,3 @@ body {
   display: flex;
   justify-content: flex-end;
 }
-.background-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Ensures video fills the screen */
-  opacity: 0.6; /* Adjust transparency */
-  display: block !important; /* Ensure it's not hidden */
-  visibility: visible !important;
-  z-index: 0; /* Move it to the lowest layer, but not hidden */
-}
-/* Dark Overlay */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4); /* Dark overlay */
-  z-index: 1; /* Ensure it’s above the video */
-}
-
-/* Ensure Login Form is Visible */
-.login-form {
-  position: relative;
-  z-index: 2; /* Ensure it's above the overlay */
-  background: rgba(255, 255, 255, 0.9); /* Slight transparency */
-  border-radius: 10px;
-  padding: 20px;
-}

@@ -6,9 +6,9 @@
         </v-toolbar>
   
         <v-tabs v-model="activeTab">
-          <v-tab>Work Logs</v-tab>
-          <v-tab>User Management</v-tab>
-          <v-tab>My Account</v-tab>
+          <v-tab>📋 Work Logs</v-tab>
+          <v-tab>👥 Management</v-tab>
+          <v-tab>🙍‍♂️ My Account</v-tab>
         </v-tabs>
   
         <v-tabs-items v-model="activeTab">

@@ -1,24 +1,66 @@
 <template>
-  <v-card>
-    <v-card-title>User Management</v-card-title>
-    <v-data-table :headers="headers" :items="users" class="elevation-1">
-      <template v-slot:item.full_name="{ item }">
-        <span>{{ item.first_name }} {{ item.last_name }}</span>
-      </template>
-      <template v-slot:item.is_staff="{ item }">
-        <v-checkbox
-          :input-value="item.is_staff"
-          readonly
-          disabled
-        ></v-checkbox>
-      </template>
-      <template v-slot:item.actions="{ item }">
-        <v-btn color="primary" @click="editUser(item)">Edit</v-btn>
-        <v-btn color="error" @click="resetPassword(item)">Reset Password</v-btn>
-      </template>
-    </v-data-table>
-  </v-card>
+  <v-container fluid>
+    <v-card class="pa-4">
+      <v-card-title class="d-flex justify-space-between align-center">
+        <h3>👥 User Management</h3>
+      </v-card-title>
+
+      <v-data-table
+        :headers="headers"
+        :items="users"
+        class="elevation-2 mt-4"
+        dense
+        item-value="id"
+      >
+        <!-- ✅ Full Name Column -->
+        <template v-slot:item.full_name="{ item }">
+          <span>{{ item.first_name }} {{ item.last_name }}</span>
+        </template>
+
+        <!-- ✅ Admin Column (Yes / No) -->
+        <template v-slot:item.is_staff="{ item }">
+          <span class="admin-label" :class="item.is_staff ? 'admin-yes' : 'admin-no'">
+            {{ item.is_staff ? "✔ Yes" : "✖ No" }}
+          </span>
+        </template>
+
+        <!-- ✅ Action Buttons -->
+        <template v-slot:item.actions="{ item }">
+          <v-btn color="primary" @click="editUser(item)" small>
+            ✏️ Edit
+          </v-btn>
+          <v-btn color="error" @click="resetPassword(item)" small class="ml-2">
+            🔄 Reset Password
+          </v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
+  </v-container>
 </template>
+
+<style scoped>
+/* ✅ Admin Column (Yes/No) Design */
+.admin-label {
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 5px;
+}
+
+.admin-yes {
+  color: #2E7D32; /* Green */
+  background: rgba(76, 175, 80, 0.15);
+}
+
+.admin-no {
+  color: #D32F2F; /* Red */
+  background: rgba(211, 47, 47, 0.15);
+}
+
+/* ✅ Action Buttons */
+.v-btn {
+  min-width: 110px;
+}
+</style>
 
 <script>
 export default {

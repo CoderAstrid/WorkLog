@@ -97,12 +97,16 @@ def update_worklog(request, log_id):
     return Response(serializer.errors, status=400)
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUser])  # ✅ Only admins can delete logs
 def delete_worklog(request, log_id):
-    """Delete a specific work log"""
-    log = get_object_or_404(WorkLog, id=log_id, user=request.user)
+    """Delete a specific work log (Admins only)"""
+    print(f"Attempting to delete log ID: {log_id}")
+    
+    log = get_object_or_404(WorkLog, id=log_id)  # ✅ Remove user filter to allow admin deletion
+    
     log.delete()
-    return Response({"message": "Work log deleted successfully"}, status=204)
+    return Response({"message": f"Work log {log_id} deleted successfully"}, status=204)
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])

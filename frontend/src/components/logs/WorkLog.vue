@@ -9,26 +9,12 @@
       <v-tabs-items v-model="tab">
         <!-- Work Logs Tab -->
         <v-tab-item>
-          <v-row class="align-center mb-2">
-            <v-col cols="6">
-              <h3 class="ml-3">Work Logs of {{ username }}</h3>
-            </v-col>
-            <v-col cols="6" class="text-right">
-              <v-btn
-                color="error"
-                :disabled="selectedLogs.length === 0"
-                @click="confirmDeleteDialog = true"
-              >
-                Delete Selected
-              </v-btn>
-            </v-col>
-          </v-row>
+          <h3 class="ml-3">Work Logs of {{ username }}</h3>          
           <v-data-table
-            v-model="selectedLogs"
+            v-model="workLogs"
             :headers="headers"
             :items="workLogs"
             item-value="id"
-            show-select
             class="elevation-1 mt-4"
             dense
           >
@@ -87,21 +73,7 @@
               ></v-textarea>
             </template>
           </v-data-table>
-          <v-btn color="success" class="mt-4" @click="addPreviousDay">Add Previous Day</v-btn>
-          <!-- 🔴 Delete Confirmation Dialog -->
-          <v-dialog v-model="confirmDeleteDialog" max-width="400px">
-            <v-card>
-              <v-card-title class="headline">Confirm Deletion</v-card-title>
-              <v-card-text>
-                Are you sure you want to delete the selected work logs?
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="grey" text @click="confirmDeleteDialog = false">Cancel</v-btn>
-                <v-btn color="red" text @click="deleteSelectedLogs">Delete</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <v-btn color="success" class="mt-4" @click="addPreviousDay">Add Previous Day</v-btn>          
         </v-tab-item>
 
         <!-- My Account Tab -->
@@ -123,13 +95,10 @@ export default {
   data() {
     return {
       username: localStorage.getItem("username") || "User",
-      workLogs: [],
-      selectedLogs: [],  // Store selected log IDs
-      confirmDeleteDialog: false,  // ✅ Add this line to fix the warning
+      workLogs: [],            
       lastAddedDate: new Date(),
       tab: 0,      
-      headers: [
-        { text: "", value: "data-table-select", width: "30px" },  // Checkbox Column
+      headers: [        
         { text: "Date", value: "date" , width: "120px"},
         { text: "Work Content", value: "content", width: "auto" },
         { text: "Notes", value: "notes", width: "auto" },
@@ -254,29 +223,7 @@ export default {
       } catch (error) {
         console.error("Error updating work log:", error);
       }
-    },
-    async deleteSelectedLogs() {
-      this.confirmDeleteDialog = false
-      if (!this.selectedLogs.length) return;
-
-      // const confirmed = confirm("Are you sure you want to delete the selected work logs?");
-      // if (!confirmed) return;
-
-      try {
-        for (const log of this.selectedLogs) {
-          if (!log.id) continue;  // ✅ Ensure only valid IDs are processed
-          await this.$http.delete(`worklogs/${log.id}/delete/`, {
-            headers: { Authorization: `Token ${localStorage.getItem("token")}` },
-          });
-        }
-        
-        // Remove deleted logs from UI
-        this.workLogs = this.workLogs.filter(log => !this.selectedLogs.includes(log));
-        this.selectedLogs = []; // Clear selection
-      } catch (error) {
-        console.error("Error deleting work logs:", error);
-      }
-    },
+    },    
   },
 };
 </script>

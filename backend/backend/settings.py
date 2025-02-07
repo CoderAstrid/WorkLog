@@ -181,3 +181,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+SECURITY_QUESTIONS = [
+    "What is the name of your first pet?",
+    "In what city were you born?",
+    "What was the name of your elementary school?",
+    "What was the first concert you attended?",
+    "What is the title of your favorite book?",
+    "What was the first movie you watched in a theater?",
+    "What is the name of your childhood best friend?",
+    "What was your first job?",
+    "What is the name of your favorite teacher?",
+    "What was the make and model of your first car?"
+]

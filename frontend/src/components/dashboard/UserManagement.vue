@@ -22,17 +22,7 @@
           <span class="admin-label" :class="item.is_staff ? 'admin-yes' : 'admin-no'">
             {{ item.is_staff ? "✔ Yes" : "✖ No" }}
           </span>
-        </template>
-
-        <!-- ✅ Action Buttons -->
-        <template v-slot:item.actions="{ item }">
-          <v-btn color="primary" @click="editUser(item)" small>
-            ✏️ Edit
-          </v-btn>
-          <v-btn color="error" @click="resetPassword(item)" small class="ml-2">
-            🔄 Reset Password
-          </v-btn>
-        </template>
+        </template>        
       </v-data-table>
     </v-card>
   </v-container>

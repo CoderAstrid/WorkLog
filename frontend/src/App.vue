@@ -6,7 +6,7 @@
       <v-spacer></v-spacer>
 
       <template v-if="isLoggedIn">
-        <template v-if="isAdmin">
+        <!-- <template v-if="isAdmin">
           <v-btn to="/admin">Admin Panel</v-btn>
           <v-btn to="/worklog">Work Log</v-btn>
           <v-btn @click="logout">Logout</v-btn>
@@ -14,6 +14,8 @@
         <template v-else>
           <v-btn @click="logout">Logout</v-btn>
         </template>
+        -->
+        <v-btn @click="logout">Logout</v-btn>
       </template>      
     </v-app-bar>
 

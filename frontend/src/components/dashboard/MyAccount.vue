@@ -54,6 +54,38 @@
                     ></v-text-field>
                     <!-- ✅ Show Validation Message -->
                     <p v-if="passwordMismatch" class="error-message">⚠ Passwords do not match.</p>
+                    <v-card class="pa-5" v-if="userProfile.role === 'admin'">
+                        <v-card-title>🛡️ Security Questions</v-card-title>
+                        
+                        <v-form @submit.prevent="saveSecurityQuestions">
+                            <v-select
+                                v-model="securityData.q1"
+                                :items="questions"
+                                label="Select Security Question 1"
+                                outlined
+                                dense
+                            ></v-select>
+                            <v-text-field v-model="securityData.a1" label="Answer 1" outlined dense></v-text-field>
+
+                            <v-select
+                                v-model="securityData.q2"
+                                :items="questions"
+                                label="Select Security Question 2"
+                                outlined
+                                dense
+                            ></v-select>
+                            <v-text-field v-model="securityData.a2" label="Answer 2" outlined dense></v-text-field>
+
+                            <v-select
+                                v-model="securityData.q3"
+                                :items="questions"
+                                label="Select Security Question 3"
+                                outlined
+                                dense
+                            ></v-select>
+                            <v-text-field v-model="securityData.a3" label="Answer 3" outlined dense></v-text-field>
+                        </v-form>
+                        </v-card>
                     <!-- ✅ Action Buttons -->
                     <v-btn color="primary" type="submit" :disabled="passwordMismatch">
                         Save Changes
@@ -66,46 +98,46 @@
 </template>
 
 <style scoped>
-/* ✅ Adjusted Top & Left Margin */
-.account-container {
-    min-height: 90vh;
-    /* Reduced height */
-    display: flex;
-    align-items: flex-start;
-    /* Align closer to the top */
-    justify-content: center;
-    padding-top: 30px;
-    /* Reduced top margin */
-}
+    /* ✅ Adjusted Top & Left Margin */
+    .account-container {
+        min-height: 90vh;
+        /* Reduced height */
+        display: flex;
+        align-items: flex-start;
+        /* Align closer to the top */
+        justify-content: center;
+        padding-top: 30px;
+        /* Reduced top margin */
+    }
 
-/* ✅ Account Card */
-.account-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 10px;
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
-    padding: 15px;
-    /* Compact Padding */
-    max-width: 450px;
-    /* Adjust width */
-}
+    /* ✅ Account Card */
+    .account-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
+        padding: 15px;
+        /* Compact Padding */
+        max-width: 450px;
+        /* Adjust width */
+    }
 
-/* ✅ Role Badge */
-.role-badge {
-    text-align: left;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
+    /* ✅ Role Badge */
+    .role-badge {
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
 
-/* ✅ Buttons */
-.v-btn {
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
+    /* ✅ Buttons */
+    .v-btn {
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
 
-/* ✅ Reduce Input Heights for Compact Design */
-.v-text-field {
-    margin-bottom: 8px;
-}
+    /* ✅ Reduce Input Heights for Compact Design */
+    .v-text-field {
+        margin-bottom: 8px;
+    }
 </style>
 
 <script>
@@ -123,7 +155,11 @@ export default {
                 role: "user", // Default role to "user"
             },
             newPassword: "",       // ✅ Stores new password
-            confirmPassword: "",   // ✅ Stores confirmation password
+            confirmPassword: "",   // ✅ Stores confirmation password            
+            // if (isAdmin) {
+                questions: [],
+                securityData: { q1: "", a1: "", q2: "", a2: "", q3: "", a3: "" }
+            // }
         };
     },
     computed: {
@@ -132,9 +168,27 @@ export default {
         },
     },
     async mounted() {
-        this.fetchProfile();
+        await this.fetchProfile(); {
+            this.fetchSecurityQuestions();
+        }        
     },
     methods: {
+        async fetchSecurityQuestions() {
+            if(this.userProfile.role==="admin") {                
+                const response = await this.$http.get("user/security-questions/");
+                this.questions = response.data.questions;
+            }
+        },
+        async saveSecurityQuestions() {
+            try {
+                await this.$http.post("/admin/security-questions/", this.securityData, {
+                    headers: { Authorization: `Token ${localStorage.getItem("token")}` }
+                });
+                alert("Security questions updated!");
+            } catch (error) {
+                alert("Failed to save security questions.");
+            }
+        },
         async fetchProfile() {
             try {
                 const endpoint = this.isAdmin ? "admin/profile/" : "user/profile/";
@@ -168,7 +222,9 @@ export default {
                 if (this.newPassword !== "") {
                     updateData.password = this.newPassword; // ✅ Only send password if filled
                 }
-
+                if(this.userProfile.role === "admin" && this.securityData.a1 !== "") {
+                    updateData.securityData = this.securityData;
+                }
                 await this.$http.put(endpoint, updateData, {
                     headers: { Authorization: `Token ${localStorage.getItem("token")}` },
                 });

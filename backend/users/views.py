@@ -1,5 +1,6 @@
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 # from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -15,9 +16,121 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 import uuid
 from django.http import JsonResponse
+import random
+from django.utils.timezone import now, timedelta
 
 # Store reset tokens
 password_reset_tokens = {}
+
+SECURITY_QUESTIONS = [
+    "What is the name of your first pet?",
+    "In what city were you born?",
+    "What was the name of your elementary school?",
+    "What was the first concert you attended?",
+    "What is the title of your favorite book?",
+    "What was the first movie you watched in a theater?",
+    "What is the name of your childhood best friend?",
+    "What was your first job?",
+    "What is the name of your favorite teacher?",
+    "What was the make and model of your first car?"
+]
+
+@api_view(['GET'])
+def get_security_questions(request):
+    """Returns predefined security questions"""
+    return Response({"questions": SECURITY_QUESTIONS})
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def admin_password_reset_request(request):
+    user = CustomUser.objects.get(username=request.data.get("username"))
+
+    # Check if the reset is locked due to failed attempts
+    if user.lock_until and now() < user.lock_until:
+        return Response({"error": "Too many failed attempts. Try again later."}, status=403)
+
+    # Select 2 random questions
+    questions = random.sample(
+        [
+            (user.security_question_1, user.security_answer_1),
+            (user.security_question_2, user.security_answer_2),
+            (user.security_question_3, user.security_answer_3),
+        ],
+        2
+    )
+    
+    return Response({
+        "question_1": questions[0][0],
+        "question_2": questions[1][0],
+    })
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def verify_security_answers(request):
+    user = CustomUser.objects.get(username=request.data.get("username"))
+    answer_1 = request.data.get("answer_1")
+    answer_2 = request.data.get("answer_2")
+
+    # Check answers
+    correct_answers = [
+        user.security_answer_1.lower(),
+        user.security_answer_2.lower(),
+        user.security_answer_3.lower()
+    ]
+
+    if answer_1.lower() in correct_answers and answer_2.lower() in correct_answers:
+        # Reset failed attempts
+        user.failed_attempts = 0
+        user.lock_until = None
+        user.save()
+        return Response({"message": "Security answers correct. You can now reset your password."})
+
+    # If incorrect, increase failed attempts
+    user.failed_attempts += 1
+    if user.failed_attempts >= 3:
+        user.lock_until = now() + timedelta(minutes=30)  # Lock for 30 min
+    user.save()
+
+    return Response({"error": "Incorrect answers. Try again."}, status=403)
+
+@api_view(['POST'])
+def update_security_questions(request):
+    user = request.user
+    data = request.data
+
+    user.security_question_1 = data.get("security_question_1")
+    user.security_answer_1 = data.get("security_answer_1")
+    user.security_question_2 = data.get("security_question_2")
+    user.security_answer_2 = data.get("security_answer_2")
+    user.security_question_3 = data.get("security_question_3")
+    user.security_answer_3 = data.get("security_answer_3")
+
+    user.save()
+    return Response({"message": "Security questions updated successfully."})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def request_user_password_reset(request):
+    user = CustomUser.objects.get(email=request.data.get("email"))
+    
+    # Send email to admin
+    send_mail(
+        "Password Reset Request",
+        f"User {user.username} has requested a password reset. Approve at /admin/usermanagement",
+        "admin@example.com",
+        ["admin@example.com"],
+    )
+
+    return Response({"message": "Password reset request sent to admin."})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def approve_password_reset(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    
+    reset_url = f"http://yourfrontend.com/reset-password/{user_id}"
+    
+    return Response({"reset_url": reset_url})
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
